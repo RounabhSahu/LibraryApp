@@ -90,57 +90,64 @@ const Home = () => {
 
 
     return (
-        <div className='text-2xl text-center flex flex-col justify-center items-center min-h-screen'>
+        <div className='text-2xl text-center flex flex-col justify-center items-center min-h-screen bg-gradient-to-b from-cyan-900 to-purple-900'>
 
-            <div>
-                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
-                    <input
-                        type="text"
-                        className='border border-yellow-400 rounded-l pl-2'
-                        onChange={(e)=>setSearchText(e.target.value)}
-                        value={searchText}/>
-                    <button className='bg-blue-500 p-2 rounded-r' onClick={()=>handleSubmit()}>Search</button>
+            <div className='w-full'>
+                <div className='flex flex-col w-1/2 lg:w-1/3 min-w-fit mx-auto'>
+                    <div className='flex flex-row mx-auto border border-amber-500 rounded w-full'>
+                        <input
+                            type="text"
+                            className='block min-h-[auto] h-10 w-full rounded border-0 bg-clip-text bg-gradient-to-t from-red-400 to-blue-400 text-white/50 font-serif font-bold px-3 outline-none hover:border hover:border-yellow-400 focus:bg-amber-500/20 focus:border focus:border-amber-400 placeholder:hover:text-white/50'
+                            onChange={(e)=>setSearchText(e.target.value)}
+                            placeholder={'SEARCH'}
+                            value={searchText}/>
+
+                    </div>
+                    <button className='bg-transparent hover:bg-blue-300/20 w-fit h-fit mx-auto mb-2 py-1 px-4 rounded mt-2 font-mono border border-blue-300 text-blue-300 active:bg-lime-200/20 active:border-lime-300 hover:text-lime-300 transition-all duration-200' onClick={()=>handleSubmit()}>SEARCH</button>
                 </div>
-                <div>Advanced Options <span onClick={()=>setOptions(!options)} className='cursor-pointer'>{options?"↓":"↑"}</span></div>
+                <div className='text-sky-300 border-2 border-sky-300/50 pb-2 mx-auto w-fit px-4 rounded hover:border-blue-300'>
+                    <span onClick={()=>setOptions(!options)} className='cursor-pointer text-xl w-fit px-4 rounded my-2 hover:text-lime-300 active:text-amber-300 transition-all duration-200'>Advanced Options {options?" ↑":" ↓"}</span>
+                    <div className={`transition-all duration-1000 mt-2 ${options?"flex flex-col":"hidden"}`}>
+                        <div className='flex flex-row mx-auto border border-amber-500 rounded  my-1 h-fit'>
+                            <input
+                                type="text"
+                                className='block min-h-[auto] h-10 w-full rounded border-0 bg-clip-text bg-gradient-to-t from-red-400 to-blue-400 text-white/50 font-serif font-bold px-3 outline-none hover:border hover:border-yellow-400 focus:bg-amber-500/20 focus:border focus:border-amber-400 placeholder:hover:text-white/50'
+                                onChange={(e)=>setTitle(e.target.value)}
+                                placeholder='Title'
+                                value={title}/>
+
+                        </div>
+                        <div className='flex flex-row mx-auto border border-amber-500 rounded  my-1 h-fit'>
+                            <input
+                                type="text"
+                                className='block min-h-[auto] h-10 w-full rounded border-0 bg-clip-text bg-gradient-to-t from-red-400 to-blue-400 text-white/50 font-serif font-bold px-3 outline-none hover:border hover:border-yellow-400 focus:bg-amber-500/20 focus:border focus:border-amber-400 placeholder:hover:text-white/50'
+                                onChange={(e)=>setAuthor(e.target.value)}
+                                placeholder='Author'
+                                value={author}/>
+
+                        </div>
+                        <div className='flex flex-row mx-auto border border-amber-500 rounded  my-1 h-fit'>
+                            <input
+                                type="text"
+                                className='block min-h-[auto] h-10 w-full rounded border-0 bg-clip-text bg-gradient-to-t from-red-400 to-blue-400 text-white/50 font-serif font-bold px-3 outline-none hover:border hover:border-yellow-400 focus:bg-amber-500/20 focus:border focus:border-amber-400 placeholder:hover:text-white/50'
+                                onChange={(e)=>setPublisher(e.target.value)}
+                                placeholder='Publisher'
+                                value={publisher}/>
+
+                        </div>
+                        <div className='flex flex-row mx-auto border border-amber-500 rounded  my-1 h-fit'>
+                            <input
+                                type="text"
+                                className='block min-h-[auto] h-10 w-full rounded border-0 bg-clip-text bg-gradient-to-t from-red-400 to-blue-400 text-white/50 font-serif font-bold px-3 outline-none hover:border hover:border-yellow-400 focus:bg-amber-500/20 focus:border focus:border-amber-400 placeholder:hover:text-white/50'
+                                onChange={(e)=>setSubject(e.target.value)}
+                                placeholder='Subject'
+                                value={subject}/>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div className={`transition-all duration-1000 ${options?"flex flex-col":"hidden"}`}>
-                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
-                    <input
-                        type="text"
-                        className='border border-yellow-400 rounded-l pl-2'
-                        onChange={(e)=>setTitle(e.target.value)}
-                        placeholder='Title'
-                        value={title}/>
 
-                </div>
-                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
-                    <input
-                        type="text"
-                        className='border border-yellow-400 rounded-l pl-2'
-                        onChange={(e)=>setAuthor(e.target.value)}
-                        placeholder='Author'
-                        value={author}/>
-
-                </div>
-                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
-                    <input
-                        type="text"
-                        className='border border-yellow-400 rounded-l pl-2'
-                        onChange={(e)=>setPublisher(e.target.value)}
-                        placeholder='Publisher'
-                        value={publisher}/>
-
-                </div>
-                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
-                    <input
-                        type="text"
-                        className='border border-yellow-400 rounded-l pl-2'
-                        onChange={(e)=>setSubject(e.target.value)}
-                        placeholder='Subject'
-                        value={subject}/>
-                </div>
-                <button className='bg-blue-500 p-2 rounded' onClick={()=>handleSubmit()}>Search</button>
-            </div>
             {loading? <Loading></Loading> :null}
             {data===null  || empty ?null:<div className="flex flex-col">
                 <ListView data={data} searchQuery={searchQuery} searchText={searchText}></ListView>
