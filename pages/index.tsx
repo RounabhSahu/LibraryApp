@@ -1,124 +1,155 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import React, {useState} from 'react';
+import Swal from 'sweetalert2';
+import ListView from '../components/ListView';
+import Loading from '../components/loading';
+const Home = () => {
+    const apiKey = 'AIzaSyANGY0cEkuAebB_iFkv3iH5bGcqs7t7si0';
+    const [searchText, setSearchText] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [title, setTitle] = useState('');
+    const [author, setAuthor] = useState('');
+    const [publisher, setPublisher] = useState('');
+    const [subject, setSubject] = useState('');
+    const [empty, setEmpty] = useState(false);
+    const [options, setOptions] = useState(false);
+    const warn=(e)=>{
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e,
+            timer: 2000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            onOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            },
+        })
+    }
 
-const inter = Inter({ subsets: ['latin'] })
+    const handleSubmit = () => {
+        if (!searchText && !author && !title && !publisher && !subject) {
+            warn('All fields are empty');
+        } else {
+            let tempUrl='';
+            setSearchQuery(searchText);
+            let x = []
+            if (author){
+                x.push(`inauthor:${author}`)
+            }
+            if (title){
+                x.push(`intitle:${title}`)
+            }
+            if (publisher){
+                x.push(`inpublisher:${publisher}`)
+            }
+            if (subject){
+                x.push(`insubject:${subject}`)
+            }
+            if(searchText && x.length>0){
+                setSearchQuery(`${searchText}+${x.join('+')}`)
+                tempUrl=`https://www.googleapis.com/books/v1/volumes?q=${searchText}+${x.join('+')}&startIndex=0&maxResults=10&key=${apiKey}`;
+            }else {
+                if (searchText) {
+                    setSearchQuery(`${searchText}`)
+                    tempUrl = `https://www.googleapis.com/books/v1/volumes?q=${searchText}&startIndex=0&maxResults=10&key=${apiKey}`;
+                } else {
+                    setSearchQuery(`${x.join('+')}`)
+                    tempUrl = `https://www.googleapis.com/books/v1/volumes?q=${x.join('+')}&startIndex=0&maxResults=10&key=${apiKey}`;
+                }
+            }
+            // Swal.fire({
+            //     title: 'Loading...',
+            //     html: '<img src="https://stock.adobe.com/in/images/loading-circle-sign-vector-isolated/260135521" />',
+            //     showConfirmButton: false,
+            // });
+            setLoading(true);
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            // setSearchQuery(searchText); // set searchQuery to searchText
+            fetch(tempUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Swal.close();
+                    setLoading(false);
+                    if(data.totalItems===0){
+                        console.log('emptry set true')
+                        setEmpty(true)
+                    }
+                    else{
+                        console.log('emptry set false')
+                        setEmpty(false)
+                        setData(data);
+                    }
+                });
+        }
+    };
+
+
+
+
+    return (
+        <div className='text-2xl text-center flex flex-col justify-center items-center min-h-screen'>
+
+            <div>
+                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
+                    <input
+                        type="text"
+                        className='border border-yellow-400 rounded-l pl-2'
+                        onChange={(e)=>setSearchText(e.target.value)}
+                        value={searchText}/>
+                    <button className='bg-blue-500 p-2 rounded-r' onClick={()=>handleSubmit()}>Search</button>
+                </div>
+                <div>Advanced Options <span onClick={()=>setOptions(!options)} className='cursor-pointer'>{options?"↓":"↑"}</span></div>
+            </div>
+            <div className={`transition-all duration-1000 ${options?"flex flex-col":"hidden"}`}>
+                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
+                    <input
+                        type="text"
+                        className='border border-yellow-400 rounded-l pl-2'
+                        onChange={(e)=>setTitle(e.target.value)}
+                        placeholder='Title'
+                        value={title}/>
+
+                </div>
+                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
+                    <input
+                        type="text"
+                        className='border border-yellow-400 rounded-l pl-2'
+                        onChange={(e)=>setAuthor(e.target.value)}
+                        placeholder='Author'
+                        value={author}/>
+
+                </div>
+                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
+                    <input
+                        type="text"
+                        className='border border-yellow-400 rounded-l pl-2'
+                        onChange={(e)=>setPublisher(e.target.value)}
+                        placeholder='Publisher'
+                        value={publisher}/>
+
+                </div>
+                <div className='flex flex-row mx-auto border border-amber-500 rounded p-2'>
+                    <input
+                        type="text"
+                        className='border border-yellow-400 rounded-l pl-2'
+                        onChange={(e)=>setSubject(e.target.value)}
+                        placeholder='Subject'
+                        value={subject}/>
+                </div>
+                <button className='bg-blue-500 p-2 rounded' onClick={()=>handleSubmit()}>Search</button>
+            </div>
+            {loading? <Loading></Loading> :null}
+            {data===null  || empty ?null:<div className="flex flex-col">
+                <ListView data={data} searchQuery={searchQuery} searchText={searchText}></ListView>
+            </div>}
+            {
+                empty && <div>No Results Found</div>
+            }
         </div>
-      </div>
+    );
+};
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default Home;
