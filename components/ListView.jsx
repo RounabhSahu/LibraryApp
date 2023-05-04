@@ -9,13 +9,20 @@ const ListView = ({data: oldData,searchQuery}) => {
     const apiKey = 'AIzaSyANGY0cEkuAebB_iFkv3iH5bGcqs7t7si0';
 
     useEffect(() => {
-
         window.addEventListener('scroll', handleScroll);
+        window.addEventListener('touchmove', handleScroll);
         return () => {
             window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('touchmove', handleScroll);
         };
-    }, [searchQuery,pageRef.current]);
+    }, [searchQuery, pageRef.current]);
 
+    const handleScroll = () => {
+        if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+            handleUpdate(pageRef.current);
+            pageRef.current = pageRef.current + 5;
+        }
+    };
 
     useEffect(() => {
         setData(oldData.items)
@@ -26,7 +33,7 @@ const ListView = ({data: oldData,searchQuery}) => {
 
     const handleUpdate=(page)=>{
 
-        if(!end){
+
             console.log(`${baseUrl}?q=${searchQuery}&startIndex=${page}&maxResults=5&key=${apiKey}`)
             fetch(`${baseUrl}?q=${searchQuery}&startIndex=${page}&maxResults=5&key=${apiKey}`)
                 .then(response => response.json())
@@ -40,14 +47,9 @@ const ListView = ({data: oldData,searchQuery}) => {
                     }
 
                 });
-        }
+
     }
-    const handleScroll = () => {
-        if ( window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight ){
-            handleUpdate(pageRef.current)
-            pageRef.current=pageRef.current+5;
-        }
-    };
+
     return (
         <>
             <div className='bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500'>Total Items Found : {oldData.totalItems}</div>
